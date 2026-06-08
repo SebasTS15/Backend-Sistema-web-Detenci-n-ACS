@@ -6,15 +6,39 @@ import torch
 
 EXPECTED_SAMPLES = 3840
 EXPECTED_CHANNELS = 3
+EXPECTED_CHANNEL_NAMES = ["FLOW_IDX", "THO_IDX", "ABD_IDX"]
 
 
-def prepare_signal(signals: list[list[float]], normalize: bool = True) -> tuple[torch.Tensor, dict[str, Any]]:
+def prepare_signal(
+    signals: list[list[float]],
+    normalize: bool = True,
+    channel_names: list[str] | None = None,
+) -> tuple[torch.Tensor, dict[str, Any]]:
+    """
+    Prepara señales para el modelo, validando que sean compatibles con los canales de entrenamiento.
+    
+    Args:
+        signals: Matriz 2D [muestras, canales] con los datos de las señales
+        normalize: Si normalizar por canal (z-score)
+        channel_names: Nombres de los canales para validar (opcional)
+        
+    Returns:
+        Tuple con el tensor preparado y metadata del procesamiento
+        
+    Raises:
+        ValueError: Si los canales no son compatibles con el modelo
+    """
     array = np.asarray(signals, dtype=np.float32)
 
     if array.ndim != 2:
         raise ValueError("signals debe ser una matriz 2D con forma [muestras, canales].")
 
     original_shape = list(array.shape)
+    
+    # Validar nombres de canales si se proporcionan
+    if channel_names is not None:
+        _validate_channel_names(channel_names)
+    
     array = _fit_channels(array, EXPECTED_CHANNELS)
     array = _fit_samples(array, EXPECTED_SAMPLES)
 
@@ -26,6 +50,7 @@ def prepare_signal(signals: list[list[float]], normalize: bool = True) -> tuple[
         "original_shape": original_shape,
         "processed_shape": [EXPECTED_SAMPLES, EXPECTED_CHANNELS],
         "normalized": normalize,
+        "channel_names": channel_names or EXPECTED_CHANNEL_NAMES,
     }
     return tensor, info
 
@@ -57,3 +82,35 @@ def _normalize_per_channel(array: np.ndarray) -> np.ndarray:
     std = array.std(axis=0, keepdims=True)
     std = np.where(std < 1e-6, 1.0, std)
     return (array - mean) / std
+
+
+def _validate_channel_names(channel_names: list[str]) -> None:
+    """
+    Valida que los nombres de canales sean compatibles con el modelo.
+    
+    Args:
+        channel_names: Lista con los nombres de los canales
+        
+    Raises:
+        ValueError: Si los canales no son los esperados
+    """
+    if len(channel_names) != EXPECTED_CHANNELS:
+        raise ValueError(
+            f"Se esperan {EXPECTED_CHANNELS} canales, pero se recibieron {len(channel_names)}."
+        )
+    
+    # Verificar que todos los canales sean válidos
+    invalid_channels = [ch for ch in channel_names if ch not in EXPECTED_CHANNEL_NAMES]
+    if invalid_channels:
+        raise ValueError(
+            f"Canales no válidos: {invalid_channels}. "
+            f"Se esperan: {EXPECTED_CHANNEL_NAMES}"
+        )
+    
+    # Verificar que estén todos los canales esperados
+    missing_channels = [ch for ch in EXPECTED_CHANNEL_NAMES if ch not in channel_names]
+    if missing_channels:
+        raise ValueError(
+            f"Faltan canales requeridos: {missing_channels}. "
+            f"Se esperan: {EXPECTED_CHANNEL_NAMES}"
+        )

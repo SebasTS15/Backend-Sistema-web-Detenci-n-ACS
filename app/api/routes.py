@@ -43,7 +43,11 @@ def predict(payload: PredictRequest, db: Session = Depends(get_db)) -> PredictRe
         raise HTTPException(status_code=404, detail="Usuario no encontrado.")
 
     try:
-        prediction = get_model_service().predict(payload.signals, normalize=payload.normalize)
+        prediction = get_model_service().predict(
+            payload.signals,
+            normalize=payload.normalize,
+            channel_names=payload.channel_names,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:

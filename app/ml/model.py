@@ -3,7 +3,7 @@ from torch import nn
 
 
 class CentralApneaCNN(nn.Module):
-    """Arquitectura inferida del state_dict del modelo entrenado."""
+    """Arquitectura inferida del state_dict del modelo entrenado (DEPRECATED - usar ResNetApneaCentral)."""
 
     def __init__(self) -> None:
         super().__init__()

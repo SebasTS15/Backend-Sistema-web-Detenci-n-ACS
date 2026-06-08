@@ -9,9 +9,17 @@ class Settings(BaseSettings):
     app_name: str = "Backend Tesis Apnea"
     app_env: str = "development"
 
-    model_path: Path = Path(r"C:\UNIVERSIDAD\DataSetApnea\modelo_apnea_central_0-3.pth")
+    model_path: Path = Path(r"C:\UNIVERSIDAD\BackednTesis\modelo_resnet_apnea_central_0-7.pth")
     model_threshold: float = Field(default=0.3, ge=0.0, le=1.0)
 
+    # Base de datos - Supabase PostgreSQL
+    # Opción 1: URL de conexión completa (recomendado para Supabase)
+    database_url: str | None = Field(
+        default=None,
+        description="URL completa de conexión PostgreSQL (ej: postgresql://user:pass@host:port/db)",
+    )
+    
+    # Opción 2: Componentes individuales (para compatibilidad)
     db_host: str = "localhost"
     db_port: int = 5432
     db_name: str = "DB_Sistema_Deteccion_ACS"
@@ -22,8 +30,11 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    @property
-    def database_url(self) -> str:
+    def get_database_url(self) -> str:
+        """Retorna la URL de conexión a la base de datos."""
+        if self.database_url:
+            return self.database_url
+        
         return (
             f"postgresql+psycopg://{self.db_user}:{self.db_password}"
             f"@{self.db_host}:{self.db_port}/{self.db_name}"
