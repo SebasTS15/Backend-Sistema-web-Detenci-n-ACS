@@ -28,3 +28,19 @@ class HealthResponse(BaseModel):
     status: str
     database: str
     model_loaded: bool
+
+
+class ErrorDetailItem(BaseModel):
+    loc: list[Any]
+    msg: str
+    type: str
+
+
+class ValidationErrorResponse(BaseModel):
+    detail: list[ErrorDetailItem]
+    code: str = "validation_error"
+
+
+class ErrorResponse(BaseModel):
+    detail: str
+    code: str | None = None

@@ -28,6 +28,25 @@ class Settings(BaseSettings):
 
     cors_origins: str = "*"
 
+    jwt_secret_key: str = Field(
+        default="CHANGE_ME_SUPER_SECRET_KEY",
+        env="JWT_SECRET_KEY",
+        description="Clave secreta para firmar los JWT.",
+    )
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expires_minutes: int = 60
+
+    auth_username: str = Field(
+        default="admin",
+        env="AUTH_USERNAME",
+        description="Nombre de usuario para autenticación básica JWT.",
+    )
+    auth_password: str = Field(
+        default="admin",
+        env="AUTH_PASSWORD",
+        description="Contraseña para autenticación básica JWT.",
+    )
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     def get_database_url(self) -> str:

@@ -1,0 +1,14 @@
+Requisitos del backend:
+
+- fastapi
+- uvicorn[standard]
+- sqlalchemy
+- psycopg[binary]
+- psycopg2-binary
+- pydantic-settings
+- numpy
+- torch
+- python-dotenv
+- python-jose[cryptography]
+
+Este archivo describe las dependencias que necesita el backend para funcionar, incluyendo JWT y carga de configuraciones desde .env.

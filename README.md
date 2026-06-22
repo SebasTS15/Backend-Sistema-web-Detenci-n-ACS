@@ -11,7 +11,7 @@ pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Edita `.env` con el nombre, usuario y clave de tu base de datos local.
+Edita `.env` con los datos sensibles de tu proyecto: conexión a la base de datos, JWT y credenciales de acceso.
 
 ## Ejecutar
 
@@ -24,6 +24,19 @@ Documentacion interactiva:
 ```text
 http://127.0.0.1:8000/docs
 ```
+
+## Autenticación JWT
+
+Para obtener un token usa `POST /api/v1/auth/token` con JSON:
+
+```json
+{
+  "username": "admin",
+  "password": "admin"
+}
+```
+
+Luego usa el header `Authorization: Bearer <token>` en los endpoints protegidos como `/api/v1/predict`.
 
 ## Entrada de prediccion
 
