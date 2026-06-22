@@ -42,23 +42,23 @@ Luego usa el header `Authorization: Bearer <token>` en los endpoints protegidos 
 
 `POST /api/v1/predict`
 
-```json
-{
-  "usuario_id": 1,
-  "paciente_id": "paciente-001",
-  "signals": [
-    [0.12, 0.03, 0.44],
-    [0.10, 0.02, 0.41]
-  ],
-  "metadata": {
-    "fuente": "frontend"
-  },
-  "guardar_resultado": true,
-  "guardar_historial": true
-}
+Este endpoint ahora recibe archivos `multipart/form-data` con los formatos soportados: `.edf`, `.dat` y `.apn`.
+
+Ejemplo con `curl`:
+
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/predict" \
+  -H "Authorization: Bearer <token>" \
+  -F "archivo=@/ruta/a/registro.edf" \
+  -F "usuario_id=1" \
+  -F "paciente_id=paciente-001" \
+  -F "metadata={\"fuente\": \"frontend\"}" \
+  -F "normalize=true" \
+  -F "guardar_resultado=true" \
+  -F "guardar_historial=true"
 ```
 
-La API ajusta la entrada a `3840 x 3`: si faltan muestras rellena con ceros, si sobran recorta, y si llegan mas o menos canales adapta a 3 canales.
+La API lee el archivo, extrae las señales esperadas y ajusta la entrada a `3840 x 3`; si faltan muestras rellena con ceros, si sobran recorta, y si hay más/menos canales adapta a 3 canales.
 
 ## Nota sobre tablas existentes
 

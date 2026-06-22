@@ -8,3 +8,5 @@ numpy
 torch
 python-dotenv
 python-jose[cryptography]
+pyedflib
+python-multipart
